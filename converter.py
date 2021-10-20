@@ -31,8 +31,8 @@ def line_breaker(full_string, line_length, var_name, outfile="", concat_type="+"
     elif concat_type == "+":
         while (len(full_string)%line_length) > 0:
             sub_string = full_string[0:line_length]
-            broken_string = broken_string + "\"" + sub_string + "\"" + '\n'
-            broken_string = broken_string + var_name + ' += '
+            broken_string = broken_string + var_name + " + \"" + sub_string + "\"" + '\n'
+            broken_string = broken_string + var_name + ' = '
             full_string = full_string[line_length:]
         broken_string += "\"\""
     if (len(outfile) > 0):
